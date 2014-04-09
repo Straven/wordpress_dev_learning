@@ -2,41 +2,10 @@
 /*
  Plugin Name: Gooods
 */
-// add custom post type products
-function create_items_post_type() {
-	register_post_type(
-		'product',
-		array(
-			'labels'      => array(
-				'name'          => __( 'Products' ),
-				'singular_name' => __( 'Product' )
-			),
-			'public'      => true,
-			'has_archive' => true,
-			'rewrite'     => array( 'slug' => 'products' ),
-		) );
-}
-
-add_action( 'init', 'create_items_post_type' );
-
-// add taxonomy for products
-function products_taxonomy() {
-	register_taxonomy(
-		'product_category',
-		'product',
-		array(
-			'hierarchical' => true,
-			'label'        => 'Product category',
-			'query_var'    => true,
-			'rewrite'      => array( 'slug' => 'product-categories' )
-		) );
-}
-
-add_action( 'init', 'products_taxonomy' );
 
 // add price for product
 function price_product_meta_box() {
-	add_meta_box( 'price_product', __( 'Price Product' ), 'show_product_meta_box', 'product' );
+	add_meta_box( 'price_product', __( 'Price Product' ), 'show_product_meta_box');
 }
 
 add_action( 'add_meta_boxes', 'price_product_meta_box' );
@@ -83,18 +52,10 @@ add_action( 'save_post', 'save_price' );
 * filtering
 */
 
-function search_products() {
-	$min_cost           = 0;
-	$max_cost           = 9999;
+function search_products() 
+{
 	$request_categories = array();
 	$sorted             = 'ASC';
-
-	global $wpdb;
-	$sql_meta_key = '_my_meta_value_key';
-	$minPrice = min($wpdb->get_results($wpdb->prepare(
-		"SELECT meta_value FROM $wpdb->postmeta WHERE meta_key=%s",$sql_meta_key), ARRAY_A));
-	$maxPrice = max($wpdb->get_results($wpdb->prepare(
-		"SELECT meta_value FROM $wpdb->postmeta WHERE meta_key=%s",$sql_meta_key), ARRAY_A));
 
 	if ( isset( $_GET['min_cost'] ) ) {
 		$min_cost = (float) $_GET['min_cost'];
@@ -110,7 +71,10 @@ function search_products() {
 		}
 	}
 
-	$categories_tax = get_terms( 'product_category' );
+	$cat_args = array(
+			'hide_empty' => 0,
+		);
+	$categories_tax = get_categories( $cat_args );
 
 	if ( isset( $_GET['categories'] ) ) {
 		$request_categories = $_GET['categories'];
@@ -121,14 +85,14 @@ function search_products() {
 		}
 	}?>
 	<div id="my_form">
-		<form action="/products/" method="get">
+		<form action="" method="get">
 			<p>
 				<label for="min_cost">Min cost:</label>
-				<input type="number" name="min_cost" value="<?php echo $minPrice['meta_value']; ?>"/>
+				<input type="number" name="min_cost" value="<?php echo $min_cost; ?>"/>
 			</p>
 			<p>
 			<label for="max_cost">Max cost: </label>
-				<input type="number" name="max_cost" value="<?php echo $maxPrice['meta_value']; ?>"/><br/>
+				<input type="number" name="max_cost" value="<?php echo $max_cost; ?>"/><br/>
 			</p>
 			<p>
 				<select multiple name="categories[]">
@@ -154,26 +118,18 @@ function search_products() {
 			'type'    => 'numeric',
 			'compare' => 'BETWEEN'
 		)
-	);
+	);	
 
-	$tax_query  = array(
-		'taxonomy' => 'product_category',
-		'field'    => 'slug',
-		'terms'    => $request_categories,
-		'operator' => 'IN',
-		'relation' => 'OR'
-	);
-	$paged      = ( get_query_var( 'paged' ) ) ? get_query_var( 'paged' ) : 1;
 	$args_query = array(
-		'post_type'      => 'product',
+		'post_type'      => 'post',
 		'meta_key'       => '_my_meta_value_key',
 		'orderby'        => 'meta_value_num',
 		'order'          => $sorted,
-		//'posts_per_page' => '-1',
-		'paged'          => $paged,
+		'posts_per_page' => '-1',
 		'meta_query'     => $meta_query,
-		'tax_query'      => array( $tax_query )
+		
 	);
 	global $wp_query;
 	$wp_query = new WP_Query( $args_query );
+	
 }
