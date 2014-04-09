@@ -522,3 +522,55 @@ require get_template_directory() . '/inc/customizer.php';
 if ( ! class_exists( 'Featured_Content' ) && 'plugins.php' !== $GLOBALS['pagenow'] ) {
 	require get_template_directory() . '/inc/featured-content.php';
 }
+
+
+function ns_navigation() {
+	global $wp_query;
+	$output = '';
+	$last   = $wp_query->max_num_pages;
+
+	for ( $i = 1; $i <= $last; $i ++ ) {
+		$output .= '<a href="' . get_site_url() . '/?paged=' . $i . '" class="page-numbers">' . $i . '</a>';
+	}
+	echo $output;
+
+}
+
+// ajax
+add_action( 'wp_enqueue_scripts', 'add_more_posts' );
+
+function add_more_posts() {
+	wp_enqueue_script( 'ajax_navigation', get_template_directory_uri() . '/js/ajax_navigation.js', array( 'jquery' ), '1.10.2', true );
+	wp_localize_script( 'ajax_navigation', 'more_posts', array( 'ajaxurl' => admin_url( 'admin-ajax.php' ) ) );
+}
+
+add_action( 'wp_ajax_more_posts', 'get_more_posts' );
+add_action( 'wp_ajax_nopriv_more_posts', 'get_more_posts' );
+
+
+function get_more_posts() {
+
+	if ( ! isset( $_GET['output'] ) ) {
+		echo _e( 'Not found...' );
+		exit();
+	}
+
+	set_query_var( 'paged', $_GET['output'] );
+
+	$paged = $_GET['output'];
+	global $wp_query;
+	$wp_query = new WP_Query();
+	$wp_query->query( 'post_type=post&paged=' . $paged );
+
+	while ( $wp_query->have_posts() ) : $wp_query->the_post(); ?>
+		<a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
+		<?php
+		the_content();
+	endwhile;
+
+	wp_reset_query();
+
+	exit();
+
+
+}
