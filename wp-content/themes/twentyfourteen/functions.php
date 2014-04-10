@@ -733,3 +733,13 @@ function search_products()
     $wp_query = new WP_Query($args_query);
 
 }
+
+/* --- Tabs --- */
+function adding_tabs_to_page()
+{
+    if (!is_admin()) {
+        wp_enqueue_script('tabs-script', get_template_directory_uri().'/js/tabs.js', array('jquery'));
+        wp_enqueue_script('jquery-ui-tabs');
+    }
+}
+add_action('wp_enqueue_scripts', 'adding_tabs_to_page');
