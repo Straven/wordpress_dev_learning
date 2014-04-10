@@ -118,7 +118,15 @@ function search_products()
 			'type'    => 'numeric',
 			'compare' => 'BETWEEN'
 		)
-	);	
+	);
+
+    $tax_query = array(
+        'taxonomy' => 'category',
+        'field' => 'slug',
+        'terms' => $request_categories,
+        'operator' => 'IN',
+        'relation' => 'OR'
+    );
 
 	$args_query = array(
 		'post_type'      => 'post',
@@ -127,6 +135,7 @@ function search_products()
 		'order'          => $sorted,
 		'posts_per_page' => '-1',
 		'meta_query'     => $meta_query,
+        'tax_query' => array($tax_query)
 		
 	);
 	global $wp_query;
