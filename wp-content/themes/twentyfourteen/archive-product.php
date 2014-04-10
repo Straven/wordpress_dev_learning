@@ -20,10 +20,10 @@ get_header(); ?>
                             <?php _e('Price: '); echo get_post_meta(get_the_ID(), '_my_meta_value_key', true).'<br />'; ?>
                             <?php
 
-                            $categories_post = get_the_terms(get_the_ID(), 'product_category');
+                            /*$categories_post = get_the_terms(get_the_ID(), 'category');
                             foreach ($categories_post as $value) {
-                                echo _e('Category: ').$value->name.'<br />';
-                            }
+                                echo _e('Category: ') . $value->name . '<br />';
+                            }*/
                         endwhile;
 
                     /*else :
