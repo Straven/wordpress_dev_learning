@@ -39,13 +39,13 @@ get_header(); ?>
                     <li>
                         <?php
                         while ($wp_query_tab2->have_posts()) : $wp_query_tab2->the_post(); ?>
-                            <a href="#tabs-2"><?php the_title(); ?></a>
+                            <a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
                         <?php endwhile; ?>
                     </li>
                     <li>
                         <?php
                         while ($wp_query_tab3->have_posts()) : $wp_query_tab3->the_post(); ?>
-                            <a href="#tabs-3"><?php the_title(); ?></a>
+                            <a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
                         <?php endwhile; ?>
                     </li>
                 </ul>
@@ -55,24 +55,12 @@ get_header(); ?>
                         <p><?php the_content(); ?></p>
                     <?php endwhile; ?>
                 </div>
-                <div id="tabs-2">
-                    <?php
-                    while ($wp_query_tab2->have_posts()) : $wp_query_tab2->the_post(); ?>
-                        <p><?php the_content(); ?></p>
-                    <?php endwhile; ?>
-                </div>
-                <div id="tabs-3">
-                    <?php
-                    while ($wp_query_tab3->have_posts()) : $wp_query_tab3->the_post(); ?>
-                        <p><?php the_content(); ?></p>
-                    <?php endwhile; ?>
-                </div>
             </div>
 
         </div>
     </section>
 
 <?php
-get_sidebar('content');
+//get_sidebar('content');
 get_sidebar();
 get_footer();
