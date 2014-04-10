@@ -578,6 +578,7 @@ function get_more_posts()
 
 }
 
+
 /* --- Filtration --- */
 // add price for product
 function price_product_meta_box()
@@ -633,7 +634,7 @@ add_action('save_post', 'save_price');
 
 function search_products()
 {
-    $request_categories = array();
+    $terms = array();
     $sorted = 'ASC';
 
     if (isset($_GET['min_cost'])) {
@@ -653,14 +654,15 @@ function search_products()
     $cat_args = array(
         'hide_empty' => 0,
     );
+
     $categories_tax = get_categories($cat_args);
 
     if (isset($_GET['categories'])) {
-        $request_categories = $_GET['categories'];
+        $terms = $_GET['categories'];
     } else {
         $i = 0;
         foreach ($categories_tax as $value) {
-            $request_categories[$i++] = $value->slug;
+            $terms[$i++] = $value->slug;
         }
     }?>
     <div id="my_form">
@@ -697,7 +699,7 @@ function search_products()
 
     if ($_GET['submit']) {
 
-        if ($_GET['min_cost']!=0 || $_GET['max_cost']!=0) {
+        if ($_GET['min_cost'] != 0 || $_GET['max_cost'] != 0) {
             $meta_query = array(
                 array(
                     'key' => '_my_meta_value_key',
@@ -708,32 +710,26 @@ function search_products()
             );
         }
 
-        $tax_query = array(
-            'taxonomy' => 'category',
-            'field' => 'slug',
-            'terms' => $request_categories,
-            'operator' => 'IN',
-            'relation' => 'OR'
-        );
+        if ($_GET['categories']) {
 
-        $args_query = array(
-            'post_type' => 'any',
-            'meta_key' => '_my_meta_value_key',
-            'orderby' => 'meta_value_num',
-            'order' => $sorted,
-            'posts_per_page' => '-1',
-            'meta_query' => $meta_query,
-            'tax_query' => array($tax_query)
-
-        );
-        $wp_query = new WP_Query($args_query);
-    } else {
-        $args_query = array(
-            'post_type' => 'any',
-            'order' => 'DESC',
-            'posts_per_page' => -1,
-        );
-        $wp_query = new WP_Query($args_query);
+            $tax_query = array(
+                'taxonomy' => 'category',
+                'field' => 'slug',
+                'terms' => $terms,
+                'operator' => 'IN',
+                'relation' => 'OR'
+            );
+        }
     }
+    $args_query = array(
+        'post_type' => 'any',
+        'meta_key' => '_my_meta_value_key',
+        'orderby' => 'meta_value_num',
+        'order' => $sorted,
+        'posts_per_page' => '-1',
+        'meta_query' => $meta_query,
+        'tax_query' => array($tax_query)
+    );
+    $wp_query = new WP_Query($args_query);
 
 }
