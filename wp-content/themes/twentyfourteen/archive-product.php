@@ -16,7 +16,7 @@ get_header(); ?>
                         // Start the Loop.
                         while ( $wp_query->have_posts() ) : $wp_query->the_post(); ?>
                             <h1><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h1>
-                            <h4><?php the_content(); ?></h4>
+                            <!--<h4><?php /*the_content(); */?></h4>-->
                             <?php _e('Price: '); echo get_post_meta(get_the_ID(), '_my_meta_value_key', true).'<br />'; ?>
                             <?php
 

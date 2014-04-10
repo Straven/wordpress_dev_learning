@@ -688,39 +688,52 @@ function search_products()
             <input type="radio" name="sorted" value="desc"/> DESC<br/>
             <input type="radio" name="sorted" value="asc"/> ASC <br/>
 
-            <p><input type="submit" value="Search"/></p>
+            <p><input type="submit" name="submit" id="submit" value="Search"/></p>
         </form>
     </div>
 
     <?php
-    $meta_query = array(
-        array(
-            'key' => '_my_meta_value_key',
-            'value' => array($min_cost, $max_cost),
-            'type' => 'numeric',
-            'compare' => 'BETWEEN'
-        )
-    );
-
-    $tax_query = array(
-        'taxonomy' => 'category',
-        'field' => 'slug',
-        'terms' => $request_categories,
-        'operator' => 'IN',
-        'relation' => 'OR'
-    );
-
-    $args_query = array(
-        'post_type' => 'post',
-        'meta_key' => '_my_meta_value_key',
-        'orderby' => 'meta_value_num',
-        'order' => $sorted,
-        'posts_per_page' => '-1',
-        'meta_query' => $meta_query,
-        'tax_query' => array($tax_query)
-
-    );
     global $wp_query;
-    $wp_query = new WP_Query($args_query);
+
+    if ($_GET['submit']) {
+
+        if ($_GET['min_cost']!=0 || $_GET['max_cost']!=0) {
+            $meta_query = array(
+                array(
+                    'key' => '_my_meta_value_key',
+                    'value' => array($min_cost, $max_cost),
+                    'type' => 'numeric',
+                    'compare' => 'BETWEEN'
+                )
+            );
+        }
+
+        $tax_query = array(
+            'taxonomy' => 'category',
+            'field' => 'slug',
+            'terms' => $request_categories,
+            'operator' => 'IN',
+            'relation' => 'OR'
+        );
+
+        $args_query = array(
+            'post_type' => 'any',
+            'meta_key' => '_my_meta_value_key',
+            'orderby' => 'meta_value_num',
+            'order' => $sorted,
+            'posts_per_page' => '-1',
+            'meta_query' => $meta_query,
+            'tax_query' => array($tax_query)
+
+        );
+        $wp_query = new WP_Query($args_query);
+    } else {
+        $args_query = array(
+            'post_type' => 'any',
+            'order' => 'DESC',
+            'posts_per_page' => -1,
+        );
+        $wp_query = new WP_Query($args_query);
+    }
 
 }
